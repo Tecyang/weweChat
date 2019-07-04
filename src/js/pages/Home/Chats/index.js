@@ -30,6 +30,23 @@ moment.updateLocale('en', {
     removeChat: stores.chat.removeChat,
     loading: stores.session.loading,
     searching: stores.search.searching,
+    showUserinfo: async(user) => {
+        var me = stores.session.user.User;
+        var caniremove = helper.isChatRoomOwner(stores.members.user);
+
+        if (user.UserName === me.UserName) {
+            user = me;
+        } else {
+            stores.contacts.memberList.find(e => {
+                // Try to find contact in contacts
+                if (e.UserName === user.UserName) {
+                    return (user = e);
+                }
+            });
+        }
+
+        stores.userinfo.toggle(true, user, caniremove);
+    },
 }))
 @observer
 export default class Chats extends Component {
@@ -59,6 +76,12 @@ export default class Chats extends Component {
                 label: 'Send Message',
                 click: () => {
                     this.props.chatTo(user);
+                }
+            },
+            {
+                label: 'Show Userinfo',
+                click: () => {
+                    this.props.showUserinfo(user);
                 }
             },
             {
@@ -143,11 +166,11 @@ export default class Chats extends Component {
                                         <div className={classes.info}>
                                             <p
                                                 className={classes.username}
-                                                dangerouslySetInnerHTML={{__html: e.RemarkName || e.NickName}} />
+                                                dangerouslySetInnerHTML={{ __html: e.RemarkName || e.NickName }} />
 
                                             <span
                                                 className={classes.message}
-                                                dangerouslySetInnerHTML={{__html: helper.getMessageContent(message) || 'No Message'}} />
+                                                dangerouslySetInnerHTML={{ __html: helper.getMessageContent(message) || 'No Message' }} />
                                         </div>
                                     </div>
 
